@@ -38,12 +38,27 @@ def solve(TESTCASE, SETTINGS):
 
     # # # Assign System Nodes Bus by Bus # # #
     # We can use these nodes to have predetermined node number for every node in our Y matrix and J vector.
+    bus_ind = 0
     for ele in bus:
         ele.assign_nodes()
+        Buses.bus_key_[ele.Bus] = bus_ind
+        bus_ind += 1
 
     # Assign any slack nodes
     for ele in slack:
-        ele.assign_nodes()
+        ele.assign_nodes(bus)
+
+    # set system node indexes for all other devices
+    for ele in generator:
+        ele.assign_indexes(bus)
+    for ele in transformer:
+        ele.assign_indexes(bus)
+    for ele in branch:
+        ele.assign_indexes(bus)
+    for ele in shunt:
+        ele.assign_indexes(bus)
+    for ele in load:
+        ele.assign_indexes(bus)
 
     # # # Initialize Solution Vector - V and Q values # # #
 
@@ -51,8 +66,7 @@ def solve(TESTCASE, SETTINGS):
     size_Y = Buses._node_index.__next__()
 
     # TODO: PART 1, STEP 1 - Complete the function to initialize your solution vector v_init.
-    v_init = None  # create a solution vector filled with zeros of size_Y
-    v_init = initialize()
+    v_init = initialize(size_Y, bus, generator, flat_start=False)
 
     # # # Run Power Flow # # #
     powerflow = PowerFlow(case_name, tol, max_iters, enable_limiting)
@@ -60,7 +74,7 @@ def solve(TESTCASE, SETTINGS):
     # TODO: PART 1, STEP 2 - Complete the PowerFlow class and build your run_powerflow function to solve Equivalent
     #  Circuit Formulation powerflow. The function will return a final solution vector v. Remove run_pf and the if
     #  condition once you've finished building your solver.
-    run_pf = False
+    run_pf = True
     if run_pf:
         v = powerflow.run_powerflow(v_init, bus, slack, generator, transformer, branch, shunt, load)
 
@@ -68,4 +82,4 @@ def solve(TESTCASE, SETTINGS):
     # TODO: PART 1, STEP 3 - Write a process_results function to compute the relevant results (voltages, powers,
     #  and anything else of interest) and find the voltage profile (maximum and minimum voltages in the case).
     #  You can decide which arguments to pass to this function yourself.
-    process_results()
+    process_results(v, bus, slack, generator)

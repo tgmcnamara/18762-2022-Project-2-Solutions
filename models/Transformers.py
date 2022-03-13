@@ -2,7 +2,7 @@ from __future__ import division
 from itertools import count
 from scripts.stamp_helpers import *
 from models.Buses import Buses
-
+import numpy as np
 
 class Transformers:
     _ids = count(0)
@@ -57,11 +57,69 @@ class Transformers:
         self.id = self._ids.__next__()
 
     def assign_indexes(self, bus):
-        self.Vr_from_node = bus[Buses.bus_key_[self.from_bus]].Vr_node
-        self.Vi_from_node = bus[Buses.bus_key_[self.from_bus]].Vi_node
-        self.Vr_to_node = bus[Buses.bus_key_[self.to_bus]].Vr_node
-        self.Vi_to_node = bus[Buses.bus_key_[self.to_bus]].Vi_node
+        self.Vr_from_node = bus[Buses.bus_key_[self.from_bus]].node_Vr
+        self.Vi_from_node = bus[Buses.bus_key_[self.from_bus]].node_Vi
+        self.Vr_to_node = bus[Buses.bus_key_[self.to_bus]].node_Vr
+        self.Vi_to_node = bus[Buses.bus_key_[self.to_bus]].node_Vi
 
-    def stamp(self, V, Ylin_val, Ylin_row, Ylin_col, Jlin_val, Jlin_row,
-          idx_Y, idx_J, bus, stamp_dual):
-        pass
+    def stamp(self, V, Ylin_val, Ylin_row, Ylin_col, Jlin_val, Jlin_row, idx_Y, idx_J):
+        if not self.status:
+            return (idx_Y, idx_J)
+
+        tr = self.tr
+        tr2 = tr*tr
+        Gt = self.G_pu
+        Bt = self.B_pu + self.Bsh_raw/2
+        phi_rad = self.ang*np.pi/180
+        cosphi = np.cos(phi_rad)
+        sinphi = np.sin(phi_rad)
+        Gcosphi = self.G_pu*cosphi
+        Gsinphi = self.G_pu*sinphi
+        Bcosphi = self.B_pu*cosphi
+        Bsinphi = self.B_pu*sinphi
+        G_shunt_from = self.G_pu/tr2
+        B_shunt_from = Bt/tr2
+        MR_from = (Gcosphi  - Bsinphi)/tr
+        MI_from = (Gsinphi  + Bcosphi)/tr
+        G_to = (Gcosphi + Bsinphi)/tr
+        B_to = (Bcosphi - Gsinphi)/tr
+        MR_to = Gt
+        MI_to = Bt
+        
+        dIrfdVrf = G_shunt_from
+        dIrfdVrt = -MR_from
+        dIrfdVif = -B_shunt_from
+        dIrfdVit = MI_from
+        idx_Y = stampY(self.Vr_from_node, self.Vr_from_node, dIrfdVrf, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_from_node, self.Vr_to_node, dIrfdVrt, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_from_node, self.Vi_from_node, dIrfdVif, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_from_node, self.Vi_to_node, dIrfdVit, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        
+        dIrtdVrf = -G_to
+        dIrtdVrt = MR_to
+        dIrtdVif = B_to
+        dIrtdVit = -MI_to
+        idx_Y = stampY(self.Vr_to_node, self.Vr_from_node, dIrtdVrf, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_to_node, self.Vr_to_node, dIrtdVrt, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_to_node, self.Vi_from_node, dIrtdVif, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_to_node, self.Vi_to_node, dIrtdVit, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        
+        dIifdVrf = B_shunt_from
+        dIifdVrt = -MI_from
+        dIifdVif = G_shunt_from
+        dIifdVit = -MR_from
+        idx_Y = stampY(self.Vi_from_node, self.Vr_from_node, dIifdVrf, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_from_node, self.Vr_to_node, dIifdVrt, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_from_node, self.Vi_from_node, dIifdVif, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_from_node, self.Vi_to_node, dIifdVit, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        
+        dIitdVrf = -B_to
+        dIitdVrt = MI_to
+        dIitdVif = -G_to
+        dIitdVit = MR_to
+        idx_Y = stampY(self.Vi_to_node, self.Vr_from_node, dIitdVrf, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_to_node, self.Vr_to_node, dIitdVrt, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_to_node, self.Vi_from_node, dIitdVif, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_to_node, self.Vi_to_node, dIitdVit, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+
+        return (idx_Y, idx_J)

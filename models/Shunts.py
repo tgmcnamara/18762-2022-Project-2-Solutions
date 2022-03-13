@@ -2,7 +2,7 @@ from __future__ import division
 from itertools import count
 from models.Buses import Buses
 from scripts.stamp_helpers import *
-from global_vars import global_vars
+from models.global_vars import global_vars
 
 class Shunts:
     _ids = count(0)
@@ -52,15 +52,14 @@ class Shunts:
         self.Nsteps = Nsteps 
         self.Bsteps= Bsteps
         self.id = self._ids.__next__()
-        self.G_pu = G_MW/global_vars.baseMVA
-        self.B_pu = B_MVAR/global_vars.baseMVA
+        self.G_pu = G_MW/global_vars.base_MVA
+        self.B_pu = B_MVAR/global_vars.base_MVA
 
     def assign_indexes(self, bus):
-        self.Vr_node = bus[Buses.bus_key_[self.Bus]].Vr_node
-        self.Vi_node = bus[Buses.bus_key_[self.Bus]].Vi_node
+        self.Vr_node = bus[Buses.bus_key_[self.Bus]].node_Vr
+        self.Vi_node = bus[Buses.bus_key_[self.Bus]].node_Vi
 
-    def stamp(self, V, Y_val, Y_row, Y_col, J_val, J_row,
-            idx_Y, idx_J, bus, stamp_dual):
+    def stamp(self, V, Y_val, Y_row, Y_col, J_val, J_row, idx_Y, idx_J):
         idx_Y = stampY(self.Vr_node, self.Vr_node,
                                     self.G_pu, Y_val, Y_row, Y_col, idx_Y)
         idx_Y = stampY(self.Vi_node, self.Vi_node,
@@ -69,3 +68,4 @@ class Shunts:
                                     -self.B_pu, Y_val, Y_row, Y_col, idx_Y)
         idx_Y = stampY(self.Vi_node, self.Vr_node,
                                     self.B_pu, Y_val, Y_row, Y_col, idx_Y)
+        return (idx_Y, idx_J)

@@ -50,35 +50,30 @@ class Loads:
     
     def assign_indexes(self, bus):
         # Nodes shared by generators on the same bus
-        self.Vr_node = bus[Buses.bus_key_[self.Bus]].Vr_node
-        self.Vi_node = bus[Buses.bus_key_[self.Bus]].Vi_node
+        self.Vr_node = bus[Buses.bus_key_[self.Bus]].node_Vr
+        self.Vi_node = bus[Buses.bus_key_[self.Bus]].node_Vi
         # check something about gen_type??
     
-    def stamp(self, V, Y_val, Y_row, Y_col, J_val, J_row,
-            idx_Y, idx_J, bus, stamp_dual):
+    def stamp(self, V, Y_val, Y_row, Y_col, J_val, J_row, idx_Y, idx_J):
         Vr = V[self.Vr_node]
         Vi = V[self.Vi_node]
 
         Irg_hist = (self.P*Vr+self.Q*Vi)/(Vr**2+Vi**2)
         dIrldVr = (self.P*(Vi**2-Vr**2) - 2*self.Q*Vr*Vi)/(Vr**2+Vi**2)**2
         dIrldVi = (self.Q*(Vr**2-Vi**2) - 2*self.P*Vr*Vi)/(Vr**2+Vi**2)**2
-        dIrgdQ = (Vi)/(Vr**2+Vi**2)
-        Vr_J_stamp = -Irg_hist + dIrldVr*Vr + dIrldVi*Vi + dIrgdQ*self.QQ
-
+        Vr_J_stamp = -Irg_hist + dIrldVr*Vr + dIrldVi*Vi
+        
         idx_Y = stampY(self.Vr_node, self.Vr_node, dIrldVr, Y_val, Y_row, Y_col, idx_Y)
         idx_Y = stampY(self.Vr_node, self.Vi_node, dIrldVi, Y_val, Y_row, Y_col, idx_Y)
-        idx_Y = stampY(self.Vr_node, self.Q_node, dIrgdQ, Y_val, Y_row, Y_col, idx_Y)
         idx_J = stampJ(self.Vr_node, Vr_J_stamp, J_val, J_row, idx_J)
 
-        Iig_hist = (self.P*Vi-Q*Vr)/(Vr**2+Vi**2)
+        Iig_hist = (self.P*Vi-self.Q*Vr)/(Vr**2+Vi**2)
         dIrldVi = -dIrldVr
         dIrldVr = dIrldVi
-        dIigdQ = -(Vr)/(Vr**2+Vi**2)
-        Vi_J_stamp = -Iig_hist + dIrldVr*Vr + dIrldVi*Vi + dIigdQ*Q
+        Vi_J_stamp = -Iig_hist + dIrldVr*Vr + dIrldVi*Vi
 
         idx_Y = stampY(self.Vr_node, self.Vr_node, dIrldVr, Y_val, Y_row, Y_col, idx_Y)
         idx_Y = stampY(self.Vr_node, self.Vi_node, dIrldVi, Y_val, Y_row, Y_col, idx_Y)
-        idx_Y = stampY(self.Vr_node, self.Q_node, dIigdQ, Y_val, Y_row, Y_col, idx_Y)
         idx_J = stampJ(self.Vr_node, Vi_J_stamp, J_val, J_row, idx_J)
 
         return (idx_Y, idx_J)

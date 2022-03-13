@@ -53,16 +53,14 @@ class Branches:
         self.id = self._ids.__next__()
 
     def assign_indexes(self, bus):
-        self.Vr_from_node = bus[Buses.bus_key_[self.from_bus]].Vr_node
-        self.Vi_from_node = bus[Buses.bus_key_[self.from_bus]].Vi_node
-        self.Vr_to_node = bus[Buses.bus_key_[self.to_bus]].Vr_node
-        self.Vi_to_node = bus[Buses.bus_key_[self.to_bus]].Vi_node
+        self.Vr_from_node = bus[Buses.bus_key_[self.from_bus]].node_Vr
+        self.Vi_from_node = bus[Buses.bus_key_[self.from_bus]].node_Vi
+        self.Vr_to_node = bus[Buses.bus_key_[self.to_bus]].node_Vr
+        self.Vi_to_node = bus[Buses.bus_key_[self.to_bus]].node_Vi
 
-    def stamp(self, V, Ylin_val, Ylin_row, Ylin_col, Jlin_val, Jlin_row,
-          idx_Y, idx_J, bus, stamp_dual):
-
+    def stamp(self, V, Ylin_val, Ylin_row, Ylin_col, Jlin_val, Jlin_row, idx_Y, idx_J):
         if not self.status:
-            return idx_Y
+            return (idx_Y, idx_J)
         # Line Bs
         #
         idx_Y = stampY(self.Vr_from_node, self.Vi_from_node, -self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
@@ -128,6 +126,6 @@ class Branches:
             idx_Y = stampY(self.Vi_to_node,
                 self.Vi_from_node, -self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
         
-        return idx_Y
+        return (idx_Y, idx_J)
 
 

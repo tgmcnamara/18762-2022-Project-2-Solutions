@@ -32,18 +32,17 @@ class Slack:
         self.Vr_set = Vset*np.cos(ang*np.pi/180)
         self.Vi_set = Vset*np.sin(ang*np.pi/180)
 
-    def assign_indexes(self, bus):
+    def assign_nodes(self, bus):
         """Assign the additional slack bus nodes for a slack bus.
         Returns:
             None
         """
-        self.Vr_node = bus[Buses.bus_key_[self.Bus]].Vr_node
-        self.Vi_node = bus[Buses.bus_key_[self.Bus]].Vi_node
+        self.Vr_node = bus[Buses.bus_key_[self.Bus]].node_Vr
+        self.Vi_node = bus[Buses.bus_key_[self.Bus]].node_Vi
         self.P_node = Buses._node_index.__next__()
         self.Q_node = Buses._node_index.__next__()
 
-    def stamp(self, V, Y_val, Y_row, Y_col, J_val, J_row,
-            idx_Y, idx_J, bus, stamp_dual):
+    def stamp(self, V, Y_val, Y_row, Y_col, J_val, J_row, idx_Y, idx_J):
         Vr = V[self.Vr_node]
         Vi = V[self.Vi_node]
         P = -V[self.P_node]

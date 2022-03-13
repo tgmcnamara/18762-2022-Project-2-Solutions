@@ -3,7 +3,7 @@ from itertools import count
 from scripts.global_vars import global_vars
 from models.Buses import Buses
 from scripts.stamp_helpers import *
-from global_vars import global_vars
+from models.global_vars import global_vars
 
 class Generators:
     _ids = count(0)
@@ -63,13 +63,13 @@ class Generators:
 
     def assign_indexes(self, bus):
         # Nodes shared by generators on the same bus
-        self.Vr_node = bus[Buses.bus_key_[self.Bus]].Vr_node
-        self.Vi_node = bus[Buses.bus_key_[self.Bus]].Vi_node
-        self.Q_node = Buses._node_index.__next__()
-        # check something about gen_type??
+        self.Vr_node = bus[Buses.bus_key_[self.Bus]].node_Vr
+        self.Vi_node = bus[Buses.bus_key_[self.Bus]].node_Vi
+        # run check to make sure the bus actually has a Q node
+        self.Q_node = bus[Buses.bus_key_[self.Bus]].node_Q
+        # check something about gen_type?? 
     
-    def stamp(self, V, Y_val, Y_row, Y_col, J_val, J_row,
-            idx_Y, idx_J, bus, stamp_dual):
+    def stamp(self, V, Y_val, Y_row, Y_col, J_val, J_row, idx_Y, idx_J):
         P = -self.P
         Vr = V[self.Vr_node]
         Vi = V[self.Vi_node]

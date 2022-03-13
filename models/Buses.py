@@ -29,6 +29,10 @@ class Buses:
 
         self.Bus = Bus
         self.Type = Type
+        self.Vm_init = Vm_init
+        self.Va_init = Va_init
+        self.Vr_init = Vm_init*np.cos(Va_init*np.pi/180)
+        self.Vi_init = Vm_init*np.sin(Va_init*np.pi/180)
 
         # initialize all nodes
         self.node_Vr = None  # real voltage node at a bus
@@ -38,6 +42,7 @@ class Buses:
         # initialize the bus key
         self.idAllBuses = self._idsAllBuses.__next__()
         Buses.all_bus_key_[self.Bus] = self.idAllBuses - 1
+
 
     def __str__(self):
         return_string = 'The bus number is : {} with Vr node as: {} and Vi node as {} '.format(self.Bus,

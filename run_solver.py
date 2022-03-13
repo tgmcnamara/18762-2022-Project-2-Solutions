@@ -1,7 +1,8 @@
 from scripts.Solve import solve
+from models.global_vars import global_vars
 
 # path to the grid network RAW file
-casename = 'testcases/PEGASE-13659_flat_start.RAW'
+casename = 'testcases/IEEE-14_prior_solution.RAW'
 
 # the settings for the solver
 settings = {
