@@ -80,3 +80,8 @@ class Slack:
         idx_J = stampJ(self.Q_node, self.Vi_set, J_val, J_row, idx_J)
 
         return (idx_Y, idx_J)
+
+    def calc_residuals(self, resid, V):
+        resid[self.P_node] = V[self.Vr_node] - self.Vr_set
+        resid[self.Q_node] = V[self.Vi_node] - self.Vi_set
+        

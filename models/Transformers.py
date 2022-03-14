@@ -123,3 +123,53 @@ class Transformers:
         idx_Y = stampY(self.Vi_to_node, self.Vi_to_node, dIitdVit, Ylin_val, Ylin_row, Ylin_col, idx_Y)
 
         return (idx_Y, idx_J)
+
+    def calc_residuals(self, resid, V):
+        Vrf = V[self.Vr_from_node]
+        Vrt = V[self.Vr_to_node]
+        Vif = V[self.Vi_from_node]
+        Vit = V[self.Vi_to_node]
+
+        tr = self.tr
+        tr2 = tr*tr
+        Gt = self.G_pu
+        Bt = self.B_pu + self.Bsh_raw/2
+        phi_rad = self.ang*np.pi/180
+        cosphi = np.cos(phi_rad)
+        sinphi = np.sin(phi_rad)
+        Gcosphi = self.G_pu*cosphi
+        Gsinphi = self.G_pu*sinphi
+        Bcosphi = self.B_pu*cosphi
+        Bsinphi = self.B_pu*sinphi
+        G_shunt_from = self.G_pu/tr2
+        B_shunt_from = Bt/tr2
+        MR_from = (Gcosphi  - Bsinphi)/tr
+        MI_from = (Gsinphi  + Bcosphi)/tr
+        G_to = (Gcosphi + Bsinphi)/tr
+        B_to = (Bcosphi - Gsinphi)/tr
+        MR_to = Gt
+        MI_to = Bt
+        
+        dIrfdVrf = G_shunt_from
+        dIrfdVrt = -MR_from
+        dIrfdVif = -B_shunt_from
+        dIrfdVit = MI_from
+        resid[self.Vr_from_node] = dIrfdVrf*Vrf + dIrfdVrt*Vrt + dIrfdVif*Vif + dIrfdVit*Vit
+
+        dIrtdVrf = -G_to
+        dIrtdVrt = MR_to
+        dIrtdVif = B_to
+        dIrtdVit = -MI_to
+        resid[self.Vr_to_node] = dIrtdVrf*Vrf + dIrtdVrt*Vrt + dIrtdVif*Vif + dIrtdVit*Vit
+
+        dIifdVrf = B_shunt_from
+        dIifdVrt = -MI_from
+        dIifdVif = G_shunt_from
+        dIifdVit = -MR_from
+        resid[self.Vi_from_node] = dIifdVrf*Vrf + dIifdVrt*Vrt + dIifdVif*Vif + dIifdVit*Vit
+
+        dIitdVrf = -B_to
+        dIitdVrt = MI_to
+        dIitdVif = -G_to
+        dIitdVit = MR_to
+        resid[self.Vi_to_node] = dIitdVrf*Vrf + dIitdVrt*Vrt + dIitdVif*Vif + dIitdVit*Vit

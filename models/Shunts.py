@@ -69,3 +69,10 @@ class Shunts:
         idx_Y = stampY(self.Vi_node, self.Vr_node,
                                     self.B_pu, Y_val, Y_row, Y_col, idx_Y)
         return (idx_Y, idx_J)
+
+    def calc_residuals(self, resid, V):
+        Vr = V[self.Vr_node]
+        Vi = V[self.Vi_node]
+        
+        resid[self.Vr_node] += -self.B_pu*Vi
+        resid[self.Vi_node] += self.B_pu*Vr

@@ -108,5 +108,12 @@ class Generators:
 
         return (idx_Y, idx_J)
 
-
+    def calc_residuals(self, resid, V):
+        P = -self.P
+        Vr = V[self.Vr_node]
+        Vi = V[self.Vi_node]
+        Q = V[self.Q_node]
+        resid[self.Vr_node] += (P*Vr+Q*Vi)/(Vr**2+Vi**2)
+        resid[self.Vi_node] += (P*Vi-Q*Vr)/(Vr**2+Vi**2)
+        resid[self.Q_node] = self.Vset**2 - Vr**2 - Vi**2
 

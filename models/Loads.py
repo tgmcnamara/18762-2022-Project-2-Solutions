@@ -77,3 +77,11 @@ class Loads:
         idx_J = stampJ(self.Vr_node, Vi_J_stamp, J_val, J_row, idx_J)
 
         return (idx_Y, idx_J)
+
+    def calc_residuals(self, resid, V):
+        P = self.P
+        Vr = V[self.Vr_node]
+        Vi = V[self.Vi_node]
+        Q = self.Q
+        resid[self.Vr_node] += (P*Vr+Q*Vi)/(Vr**2+Vi**2)
+        resid[self.Vi_node] += (P*Vi-Q*Vr)/(Vr**2+Vi**2)

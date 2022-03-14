@@ -139,7 +139,7 @@ class PowerFlow:
             # TODO: PART 1, STEP 2.4 - Complete the stamp_nonlinear function which stamps all nonlinear power grid
             #  elements. This function should call the stamp_nonlinear function of each nonlinear element and return
             #  an updated Y matrix. You need to decide the input arguments and return values.
-            (Ynlin, Jnlin) = self.stamp_nonlinear(generator, load, v_init)
+            (Ynlin, Jnlin) = self.stamp_nonlinear(generator, load, v)
 
             # # # Solve The System # # #
             # TODO: PART 1, STEP 2.5 - Complete the solve function which solves system of equations Yv = J. The
@@ -153,7 +153,7 @@ class PowerFlow:
             # TODO: PART 1, STEP 2.6 - Finish the check_error function which calculates the maximum error, err_max
             #  You need to decide the input arguments and return values.
             err_max = self.check_error(v, v_sol)
-
+            print("Iter: %d, max error: %.3e" % (NR_count, err_max))
             # # # Compute The Error at the current NR iteration # # #
             # TODO: PART 2, STEP 1 - Develop the apply_limiting function which implements voltage and reactive power
             #  limiting. Also, complete the else condition. Do not complete this step until you've finished Part 1.
@@ -162,6 +162,22 @@ class PowerFlow:
                 v = self.apply_limiting(v, v_sol)
             else:
                 v = np.copy(v_sol)
+
+        resid = np.zeros(v_init.shape)
+        for ele in slack:
+            ele.calc_residuals(resid, v)
+        for ele in generator:
+            ele.calc_residuals(resid, v)
+        for ele in load:
+            ele.calc_residuals(resid, v)
+        for ele in branch:
+            ele.calc_residuals(resid, v)
+        for ele in transformer:
+            ele.calc_residuals(resid, v)
+        for ele in shunt:
+            ele.calc_residuals(resid, v)
+        max_resid = np.amax(np.abs(resid))
         print("Powerflow converged in %d iterations" % (NR_count))
+        print("Maximum residual in system is %.3e" % (max_resid))
 
         return v
