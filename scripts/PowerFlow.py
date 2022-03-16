@@ -88,6 +88,22 @@ class PowerFlow:
         Jlin_col = np.zeros(Jnlin_row.shape, dtype=np.int)
         Jnlin = csc_matrix((Jnlin_val, (Jnlin_row, Jlin_col)), shape=(size_Y, 1), dtype=np.float64)
         return (Ynlin, Jnlin)
+    
+    def calc_resid(self, v, generator, load, slack, branch, transformer, shunt):
+        resid = np.zeros(v.shape)
+        for ele in slack:
+            ele.calc_residuals(resid, v)
+        for ele in generator:
+            ele.calc_residuals(resid, v)
+        for ele in load:
+            ele.calc_residuals(resid, v)
+        for ele in branch:
+            ele.calc_residuals(resid, v)
+        for ele in transformer:
+            ele.calc_residuals(resid, v)
+        for ele in shunt:
+            ele.calc_residuals(resid, v)
+        return resid
 
     def run_powerflow(self,
                       v_init,
@@ -154,6 +170,7 @@ class PowerFlow:
             #  You need to decide the input arguments and return values.
             err_max = self.check_error(v, v_sol)
             print("Iter: %d, max error: %.3e" % (NR_count, err_max))
+            print(np.argmax(np.abs(v-v_sol)))
             # # # Compute The Error at the current NR iteration # # #
             # TODO: PART 2, STEP 1 - Develop the apply_limiting function which implements voltage and reactive power
             #  limiting. Also, complete the else condition. Do not complete this step until you've finished Part 1.
@@ -163,20 +180,9 @@ class PowerFlow:
             else:
                 v = np.copy(v_sol)
 
-        resid = np.zeros(v_init.shape)
-        for ele in slack:
-            ele.calc_residuals(resid, v)
-        for ele in generator:
-            ele.calc_residuals(resid, v)
-        for ele in load:
-            ele.calc_residuals(resid, v)
-        for ele in branch:
-            ele.calc_residuals(resid, v)
-        for ele in transformer:
-            ele.calc_residuals(resid, v)
-        for ele in shunt:
-            ele.calc_residuals(resid, v)
+        resid = self.calc_resid(v_sol, generator, load, slack, branch, transformer, shunt)
         max_resid = np.amax(np.abs(resid))
+        max_resid_ind = np.argmax(np.abs(resid))
         print("Powerflow converged in %d iterations" % (NR_count))
         print("Maximum residual in system is %.3e" % (max_resid))
 

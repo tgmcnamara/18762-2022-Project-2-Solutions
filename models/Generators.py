@@ -92,19 +92,19 @@ class Generators:
         dIigdQ = -(Vr)/(Vr**2+Vi**2)
         Vi_J_stamp = -Iig_hist + dIigdVr*Vr + dIigdVi*Vi + dIigdQ*Q
 
-        idx_Y = stampY(self.Vr_node, self.Vr_node, dIigdVr, Y_val, Y_row, Y_col, idx_Y)
-        idx_Y = stampY(self.Vr_node, self.Vi_node, dIigdVi, Y_val, Y_row, Y_col, idx_Y)
-        idx_Y = stampY(self.Vr_node, self.Q_node, dIigdQ, Y_val, Y_row, Y_col, idx_Y)
-        idx_J = stampJ(self.Vr_node, Vi_J_stamp, J_val, J_row, idx_J)
+        idx_Y = stampY(self.Vi_node, self.Vr_node, dIigdVr, Y_val, Y_row, Y_col, idx_Y)
+        idx_Y = stampY(self.Vi_node, self.Vi_node, dIigdVi, Y_val, Y_row, Y_col, idx_Y)
+        idx_Y = stampY(self.Vi_node, self.Q_node, dIigdQ, Y_val, Y_row, Y_col, idx_Y)
+        idx_J = stampJ(self.Vi_node, Vi_J_stamp, J_val, J_row, idx_J)
 
         Vset_hist = self.Vset**2 - Vr**2 - Vi**2
         dVset_dVr = -2*Vr
         dVset_dVi = -2*Vi
-        Vset_J_stamp = -Vset_hist + dVset_dVr*Vi + dVset_dVi*Vi
+        Vset_J_stamp = -Vset_hist + dVset_dVr*Vr + dVset_dVi*Vi
 
         idx_Y = stampY(self.Q_node, self.Vr_node, dVset_dVr, Y_val, Y_row, Y_col, idx_Y)
         idx_Y = stampY(self.Q_node, self.Vi_node, dVset_dVi, Y_val, Y_row, Y_col, idx_Y)
-        idx_J = stampJ(self.Vr_node, Vset_J_stamp, J_val, J_row, idx_J)
+        idx_J = stampJ(self.Q_node, Vset_J_stamp, J_val, J_row, idx_J)
 
         return (idx_Y, idx_J)
 

@@ -39,49 +39,35 @@ class Slack:
         """
         self.Vr_node = bus[Buses.bus_key_[self.Bus]].node_Vr
         self.Vi_node = bus[Buses.bus_key_[self.Bus]].node_Vi
-        self.P_node = Buses._node_index.__next__()
-        self.Q_node = Buses._node_index.__next__()
+        self.Slack_Ir_node = Buses._node_index.__next__()
+        self.Slack_Ii_node = Buses._node_index.__next__()
 
     def stamp(self, V, Y_val, Y_row, Y_col, J_val, J_row, idx_Y, idx_J):
-        Vr = V[self.Vr_node]
-        Vi = V[self.Vi_node]
-        P = -V[self.P_node]
-        Q = V[self.Q_node]
-
-        # (Vr + jVi)*(Ir - jIi) = P + jQ
-        # (Ir - jIi) = (P + jQ)/(Vr + jVi)
-        # (Ir - jIi) = (P + jQ)(Vr - jVi)/(Vr**2 + Vi**2)
-        # (Ir - jIi) = (PVr - jPVi + jQVr + QVi)/(Vr**2 + Vi**2)
-        # (Ir - jIi) = ((PVr + QVi) - j(PVi - QVr))/(Vr**2 + Vi**2)
-        # Ir = (PVr + QVi) / (Vr**2 + Vi**2)
-        # Ii = (PVi - QVr) / (Vr**2 + Vi**2)
-
-        Irg_hist = (P*Vr - Q*Vi)/(Vr**2 + Vi**2)
-        dIrgdP = Vr/(Vr**2 + Vi**2)
-        dIrgdQ = -Vi/(Vr**2 + Vi**2)
-        Irg_Jstamp = Irg_hist - dIrgdP*P - dIrgdQ*Q
-        idx_Y = stampY(self.Vr_node, self.P_node, dIrgdP, Y_val, Y_row, Y_col, idx_Y)
-        idx_Y = stampY(self.Vr_node, self.Q_node, dIrgdQ, Y_val, Y_row, Y_col, idx_Y)
-        idx_J = stampJ(self.Vr_node, Irg_Jstamp, J_val, J_row, idx_J)
-
-        Iig_hist = (P*Vi - Q*Vr)/(Vr**2 + Vi**2)
-        dIigdP = Vi/(Vr**2 + Vi**2)
-        dIigdQ = -Vr/(Vr**2 + Vi**2)
-        Iig_Jstamp = Iig_hist - dIigdP*P - dIigdQ*Q
-        idx_Y = stampY(self.Vi_node, self.P_node, dIigdP, Y_val, Y_row, Y_col, idx_Y)
-        idx_Y = stampY(self.Vi_node, self.Q_node, dIigdQ, Y_val, Y_row, Y_col, idx_Y)
-        idx_J = stampJ(self.Vi_node, Iig_Jstamp, J_val, J_row, idx_J)
+        # slack currents leaving their nodes
+        idx_Y = stampY(self.Vr_node, self.Slack_Ir_node, 1, Y_val, Y_row, Y_col, idx_Y)
+        idx_Y = stampY(self.Vi_node, self.Slack_Ii_node, 1, Y_val, Y_row, Y_col, idx_Y)
 
         # enforce slack constraints
-        idx_Y = stampY(self.P_node, self.Vr_node, 1, Y_val, Y_row, Y_col, idx_Y)
-        idx_J = stampJ(self.P_node, self.Vr_set, J_val, J_row, idx_J)
+        idx_Y = stampY(self.Slack_Ir_node, self.Vr_node, 1, Y_val, Y_row, Y_col, idx_Y)
+        idx_J = stampJ(self.Slack_Ir_node, self.Vr_set, J_val, J_row, idx_J)
 
-        idx_Y = stampY(self.Q_node, self.Vi_node, 1, Y_val, Y_row, Y_col, idx_Y)
-        idx_J = stampJ(self.Q_node, self.Vi_set, J_val, J_row, idx_J)
+        idx_Y = stampY(self.Slack_Ii_node, self.Vi_node, 1, Y_val, Y_row, Y_col, idx_Y)
+        idx_J = stampJ(self.Slack_Ii_node, self.Vi_set, J_val, J_row, idx_J)
 
         return (idx_Y, idx_J)
 
+    def calc_slack_PQ(self, V_sol):
+        Ir = V_sol[self.Slack_Ir_node]
+        Ii = V_sol[self.Slack_Ii_node]
+        Vr = self.Vr_set
+        Vi = self.Vi_set
+        S = (Vr + 1j*Vi)*(Ir - 1j*Ii)
+        P = np.real(S)
+        Q = np.imag(S)
+        return (P, Q)
+
     def calc_residuals(self, resid, V):
-        resid[self.P_node] = V[self.Vr_node] - self.Vr_set
-        resid[self.Q_node] = V[self.Vi_node] - self.Vi_set
-        
+        resid[self.Vr_node] += V[self.Slack_Ir_node]
+        resid[self.Vr_node] += V[self.Slack_Ii_node]
+        resid[self.Slack_Ir_node] = V[self.Vr_node] - self.Vr_set
+        resid[self.Slack_Ii_node] = V[self.Vi_node] - self.Vi_set

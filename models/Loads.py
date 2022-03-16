@@ -68,13 +68,13 @@ class Loads:
         idx_J = stampJ(self.Vr_node, Vr_J_stamp, J_val, J_row, idx_J)
 
         Iig_hist = (self.P*Vi-self.Q*Vr)/(Vr**2+Vi**2)
-        dIrldVi = -dIrldVr
-        dIrldVr = dIrldVi
-        Vi_J_stamp = -Iig_hist + dIrldVr*Vr + dIrldVi*Vi
+        dIildVi = -dIrldVr
+        dIildVr = dIrldVi
+        Vi_J_stamp = -Iig_hist + dIildVr*Vr + dIildVi*Vi
 
-        idx_Y = stampY(self.Vr_node, self.Vr_node, dIrldVr, Y_val, Y_row, Y_col, idx_Y)
-        idx_Y = stampY(self.Vr_node, self.Vi_node, dIrldVi, Y_val, Y_row, Y_col, idx_Y)
-        idx_J = stampJ(self.Vr_node, Vi_J_stamp, J_val, J_row, idx_J)
+        idx_Y = stampY(self.Vi_node, self.Vr_node, dIildVr, Y_val, Y_row, Y_col, idx_Y)
+        idx_Y = stampY(self.Vi_node, self.Vi_node, dIildVi, Y_val, Y_row, Y_col, idx_Y)
+        idx_J = stampJ(self.Vi_node, Vi_J_stamp, J_val, J_row, idx_J)
 
         return (idx_Y, idx_J)
 

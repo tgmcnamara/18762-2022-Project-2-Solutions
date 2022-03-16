@@ -66,3 +66,10 @@ class Buses:
             self.node_Vr = self._node_index.__next__()
             self.node_Vi = self._node_index.__next__()
             self.node_Q = self._node_index.__next__()
+
+    def calc_Vphasor(self, V_sol):
+        Vr = V_sol[self.node_Vr]
+        Vi = V_sol[self.node_Vi]
+        Vmag = np.sqrt(Vr**2 + Vi**2)
+        Vth_deg = np.arctan2(Vi, Vr)*180/np.pi
+        return (Vmag, Vth_deg)
