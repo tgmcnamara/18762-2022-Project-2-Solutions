@@ -115,5 +115,5 @@ class Generators:
         Q = V[self.Q_node]
         resid[self.Vr_node] += (P*Vr+Q*Vi)/(Vr**2+Vi**2)
         resid[self.Vi_node] += (P*Vi-Q*Vr)/(Vr**2+Vi**2)
-        resid[self.Q_node] = self.Vset**2 - Vr**2 - Vi**2
+        resid[self.Q_node] += self.Vset**2 - Vr**2 - Vi**2
 

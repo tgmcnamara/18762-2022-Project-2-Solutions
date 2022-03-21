@@ -134,12 +134,7 @@ class Branches:
         Vi_from = V[self.Vi_from_node]
         Vi_to = V[self.Vi_to_node]
         
-        Ir_from = (Vr_from-Vr_to)*self.G_pu - (Vi_from-Vi_to)*self.B_pu - Vi_from*self.b/2
-        Ir_to = (Vr_to-Vr_from)*self.G_pu - (Vi_to-Vi_from)*self.B_pu - Vi_to*self.b/2
-        Ii_from = (Vr_from-Vr_to)*self.B_pu + (Vi_from-Vi_to)*self.G_pu + Vr_from*self.b/2
-        Ii_to = (Vr_to-Vr_from)*self.B_pu + (Vi_to-Vi_from)*self.G_pu + Vr_to*self.b/2
-
-        resid[self.Vr_from_node] += Ir_from
-        resid[self.Vr_to_node] += Ir_to
-        resid[self.Vi_from_node] += Ii_from
-        resid[self.Vi_to_node] += Ii_to
+        resid[self.Vr_from_node] += (Vr_from-Vr_to)*self.G_pu - (Vi_from-Vi_to)*self.B_pu - Vi_from*self.b/2
+        resid[self.Vr_to_node] += (Vr_to-Vr_from)*self.G_pu - (Vi_to-Vi_from)*self.B_pu - Vi_to*self.b/2
+        resid[self.Vi_from_node] += (Vr_from-Vr_to)*self.B_pu + (Vi_from-Vi_to)*self.G_pu + Vr_from*self.b/2
+        resid[self.Vi_to_node] += (Vr_to-Vr_from)*self.B_pu + (Vi_to-Vi_from)*self.G_pu + Vr_to*self.b/2

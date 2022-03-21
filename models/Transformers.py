@@ -154,22 +154,22 @@ class Transformers:
         dIrfdVrt = -MR_from
         dIrfdVif = -B_shunt_from
         dIrfdVit = MI_from
-        resid[self.Vr_from_node] = dIrfdVrf*Vrf + dIrfdVrt*Vrt + dIrfdVif*Vif + dIrfdVit*Vit
+        resid[self.Vr_from_node] += dIrfdVrf*Vrf + dIrfdVrt*Vrt + dIrfdVif*Vif + dIrfdVit*Vit
 
         dIrtdVrf = -G_to
         dIrtdVrt = MR_to
         dIrtdVif = B_to
         dIrtdVit = -MI_to
-        resid[self.Vr_to_node] = dIrtdVrf*Vrf + dIrtdVrt*Vrt + dIrtdVif*Vif + dIrtdVit*Vit
+        resid[self.Vr_to_node] += dIrtdVrf*Vrf + dIrtdVrt*Vrt + dIrtdVif*Vif + dIrtdVit*Vit
 
         dIifdVrf = B_shunt_from
         dIifdVrt = -MI_from
         dIifdVif = G_shunt_from
         dIifdVit = -MR_from
-        resid[self.Vi_from_node] = dIifdVrf*Vrf + dIifdVrt*Vrt + dIifdVif*Vif + dIifdVit*Vit
+        resid[self.Vi_from_node] += dIifdVrf*Vrf + dIifdVrt*Vrt + dIifdVif*Vif + dIifdVit*Vit
 
         dIitdVrf = -B_to
         dIitdVrt = MI_to
         dIitdVif = -G_to
         dIitdVit = MR_to
-        resid[self.Vi_to_node] = dIitdVrf*Vrf + dIitdVrt*Vrt + dIitdVif*Vif + dIitdVit*Vit
+        resid[self.Vi_to_node] += dIitdVrf*Vrf + dIitdVrt*Vrt + dIitdVif*Vif + dIitdVit*Vit

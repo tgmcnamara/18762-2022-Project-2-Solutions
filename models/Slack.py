@@ -68,6 +68,6 @@ class Slack:
 
     def calc_residuals(self, resid, V):
         resid[self.Vr_node] += V[self.Slack_Ir_node]
-        resid[self.Vr_node] += V[self.Slack_Ii_node]
-        resid[self.Slack_Ir_node] = V[self.Vr_node] - self.Vr_set
-        resid[self.Slack_Ii_node] = V[self.Vi_node] - self.Vi_set
+        resid[self.Vi_node] += V[self.Slack_Ii_node]
+        resid[self.Slack_Ir_node] += V[self.Vr_node] - self.Vr_set
+        resid[self.Slack_Ii_node] += V[self.Vi_node] - self.Vi_set

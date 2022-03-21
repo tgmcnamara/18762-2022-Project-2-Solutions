@@ -74,5 +74,5 @@ class Shunts:
         Vr = V[self.Vr_node]
         Vi = V[self.Vi_node]
         
-        resid[self.Vr_node] += -self.B_pu*Vi
-        resid[self.Vi_node] += self.B_pu*Vr
+        resid[self.Vr_node] += -self.B_pu*Vi + self.G_pu*Vr
+        resid[self.Vi_node] += self.B_pu*Vr + self.G_pu*Vi
