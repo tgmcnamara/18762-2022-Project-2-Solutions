@@ -44,11 +44,11 @@ class Transformers:
         self.rating = rating
 
         # Set minimum x:
-        if abs(self.x) < 1e-6:
-            if self.x < 0:
-                self.x = -1e-6
-            else:
-                self.x = 1e-6
+        # if abs(self.x) < 1e-6:
+        #     if self.x < 0:
+        #         self.x = -1e-6
+        #     else:
+        #         self.x = 1e-6
 
         # convert to G and B
         self.G_pu = self.r/(self.r**2+self.x**2)
@@ -71,12 +71,14 @@ class Transformers:
         Gt = self.G_pu
         Bt = self.B_pu + self.Bsh_raw/2
         phi_rad = self.ang*np.pi/180
+        if phi_rad != 0:
+            test = 2 + 2
         cosphi = np.cos(phi_rad)
         sinphi = np.sin(phi_rad)
         Gcosphi = self.G_pu*cosphi
         Gsinphi = self.G_pu*sinphi
-        Bcosphi = self.B_pu*cosphi
-        Bsinphi = self.B_pu*sinphi
+        Bcosphi = Bt*cosphi #self.B_pu*cosphi
+        Bsinphi = Bt*sinphi #self.B_pu*sinphi
         G_shunt_from = self.G_pu/tr2
         B_shunt_from = Bt/tr2
         MR_from = (Gcosphi  - Bsinphi)/tr
@@ -139,8 +141,8 @@ class Transformers:
         sinphi = np.sin(phi_rad)
         Gcosphi = self.G_pu*cosphi
         Gsinphi = self.G_pu*sinphi
-        Bcosphi = self.B_pu*cosphi
-        Bsinphi = self.B_pu*sinphi
+        Bcosphi = Bt*cosphi #self.B_pu*cosphi
+        Bsinphi = Bt*sinphi #self.B_pu*sinphi
         G_shunt_from = self.G_pu/tr2
         B_shunt_from = Bt/tr2
         MR_from = (Gcosphi  - Bsinphi)/tr

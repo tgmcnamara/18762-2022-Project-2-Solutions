@@ -3,7 +3,7 @@ import numpy as np
 from models.Buses import Buses
 from models.Buses import Buses
 from scripts.stamp_helpers import *
-
+from models.global_vars import global_vars
 
 class Slack:
 
@@ -26,11 +26,17 @@ class Slack:
         self.Bus = Bus
         self.Vset = Vset
         self.ang = ang
-        self.Pinit = Pinit
-        self.Qinit = Qinit
+        self.Pinit_MVA = Pinit
+        self.Qinit_MVA = Qinit
+        self.Pinit = Pinit/global_vars.base_MVA
+        self.Qinit = Qinit/global_vars.base_MVA
+        
         # initialize
         self.Vr_set = Vset*np.cos(ang*np.pi/180)
         self.Vi_set = Vset*np.sin(ang*np.pi/180)
+
+        self.Ir_init = (-self.Vr_set*self.Pinit - self.Vi_set*self.Qinit)/(Vset**2)
+        self.Ii_init = (-self.Vi_set*self.Pinit + self.Vi_set*self.Qinit)/(Vset**2)
 
     def assign_nodes(self, bus):
         """Assign the additional slack bus nodes for a slack bus.

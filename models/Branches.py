@@ -62,70 +62,34 @@ class Branches:
         if not self.status:
             return (idx_Y, idx_J)
         # Line Bs
-        #
         idx_Y = stampY(self.Vr_from_node, self.Vi_from_node, -self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-        #
-        idx_Y = stampY(self.Vr_from_node,
-            self.Vi_to_node, self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-        #
-        idx_Y = stampY(self.Vi_from_node,
-            self.Vr_from_node, self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-        #
-        idx_Y = stampY(self.Vi_from_node,
-            self.Vr_to_node, -self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-        #
-        idx_Y = stampY(self.Vr_to_node,
-            self.Vi_to_node, -self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-        #
-        idx_Y = stampY(self.Vr_to_node,
-            self.Vi_from_node, self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-        #
-        idx_Y = stampY(self.Vi_to_node,
-            self.Vr_to_node, self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-        #
-        idx_Y = stampY(self.Vi_to_node,
-            self.Vr_from_node, -self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_from_node, self.Vi_to_node, self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_from_node, self.Vr_from_node, self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_from_node, self.Vr_to_node, -self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_to_node, self.Vi_to_node, -self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_to_node, self.Vi_from_node, self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_to_node, self.Vr_to_node, self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_to_node, self.Vr_from_node, -self.B_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
 
         # Line Shunts
-        idx_Y = stampY(self.Vr_from_node,
-            self.Vi_from_node, -self.b/2, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-        #
-        idx_Y = stampY(self.Vi_from_node,
-            self.Vr_from_node, self.b/2, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-        #
-        idx_Y = stampY(self.Vr_to_node,
-            self.Vi_to_node, -self.b/2, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-        #
-        idx_Y = stampY(self.Vi_to_node,
-            self.Vr_to_node, self.b/2, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_from_node, self.Vi_from_node, -self.b/2, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_from_node, self.Vr_from_node, self.b/2, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_to_node, self.Vi_to_node, -self.b/2, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_to_node, self.Vr_to_node, self.b/2, Ylin_val, Ylin_row, Ylin_col, idx_Y)
 
-        if self.r != 0:
-            # Line Gs
-            #
-            idx_Y = stampY(self.Vr_from_node,
-                self.Vr_from_node, self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-            #
-            idx_Y = stampY(self.Vi_from_node,
-                self.Vi_from_node, self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-            #
-            idx_Y = stampY(self.Vr_to_node,
-                self.Vr_to_node, self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-            #
-            idx_Y = stampY(self.Vi_to_node,
-                self.Vi_to_node, self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-            #
-            idx_Y = stampY(self.Vr_from_node,
-                self.Vr_to_node, -self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-            #
-            idx_Y = stampY(self.Vi_from_node,
-                self.Vi_to_node, -self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-            #
-            idx_Y = stampY(self.Vr_to_node,
-                self.Vr_from_node, -self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-            #
-            idx_Y = stampY(self.Vi_to_node,
-                self.Vi_from_node, -self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
-        
+        if self.r == 0:
+            return (idx_Y, idx_J)
+
+        # Line Gs
+        idx_Y = stampY(self.Vr_from_node, self.Vr_from_node, self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_from_node, self.Vi_from_node, self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_to_node, self.Vr_to_node, self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_to_node, self.Vi_to_node, self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_from_node, self.Vr_to_node, -self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_from_node, self.Vi_to_node, -self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vr_to_node, self.Vr_from_node, -self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+        idx_Y = stampY(self.Vi_to_node, self.Vi_from_node, -self.G_pu, Ylin_val, Ylin_row, Ylin_col, idx_Y)
+    
         return (idx_Y, idx_J)
 
     def calc_residuals(self, resid, V):

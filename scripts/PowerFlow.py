@@ -163,6 +163,13 @@ class PowerFlow:
             #  You need to decide the input arguments and return values.
             Y = Ynlin + Ylin
             J = Jnlin + Jlin
+            zero_rows = []
+            zero_cols = []
+            for i in range(Y.shape[0]):
+                if len(Y[i,:].data) == 0:
+                    zero_rows.append(i)
+                if len(Y[:,i].data) == 0:
+                    zero_cols.append(i)
             v_sol = self.solve(Y, J)
             NR_count += 1
             # # # Compute The Error at the current NR iteration # # #

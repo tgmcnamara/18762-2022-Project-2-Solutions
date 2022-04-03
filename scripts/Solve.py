@@ -66,7 +66,7 @@ def solve(TESTCASE, SETTINGS):
     size_Y = Buses._node_index.__next__()
 
     # TODO: PART 1, STEP 1 - Complete the function to initialize your solution vector v_init.
-    v_init = initialize(size_Y, bus, generator, flat_start=False)
+    v_init = initialize(size_Y, bus, generator, slack, flat_start=False)
 
     # # # Run Power Flow # # #
     powerflow = PowerFlow(case_name, tol, max_iters, enable_limiting)

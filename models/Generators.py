@@ -56,6 +56,7 @@ class Generators:
         self.Vset = Vset
         self.Qmax = Qmax/global_vars.base_MVA
         self.Qmin = Qmin/global_vars.base_MVA
+        self.Qinit = Qinit/global_vars.base_MVA
         self.Pmax = Pmax/global_vars.base_MVA
         self.Pmin = Pmin/global_vars.base_MVA
 
