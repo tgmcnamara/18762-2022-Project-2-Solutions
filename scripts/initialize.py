@@ -9,7 +9,7 @@ def initialize(size_Y, bus, generator, slack, flat_start=False):
             V_init[ele.node_Vi] = 0
         for ele in generator:
             V_init[ele.Q_node] += (ele.Qmax+ele.Qmin)/2
-        # initialize slack currents as 0?
+        # leave slack currents initialized as 0?
     else:
         for ele in bus:
             V_init[ele.node_Vr] = ele.Vr_init

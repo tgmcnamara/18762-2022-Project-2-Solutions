@@ -68,7 +68,7 @@ class Slack:
         Vr = self.Vr_set
         Vi = self.Vi_set
         S = (Vr + 1j*Vi)*(Ir - 1j*Ii)
-        P = np.real(S)
+        P = -np.real(S)
         Q = np.imag(S)
         return (P, Q)
 
